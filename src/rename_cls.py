@@ -10,9 +10,9 @@ config = yaml.safe_load(CONFIG_PATH.read_text())
 MASTER_DIR = Path(config["master_dir"])
 PREFIXES = config.get("prefixes", {})
 
-NAME = "red_balls"
+NAME = "small"
 
-mapa = [['0', '2'], ['1', '2']]
+mapa = [['1', '0']]
 
 lbl_dir = MASTER_DIR / NAME / "labels"
 

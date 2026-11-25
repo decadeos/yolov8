@@ -1,0 +1,64 @@
+schema: '2.0'
+stages:
+  stat:
+    cmd: python src/stat.py
+    deps:
+    - path: src/stat.py
+      hash: md5
+      md5: d42f75406c3c8d9c9b0af84d74c24bf2
+      size: 2181
+  prepare:
+    cmd: python src/split_rename.py
+    deps:
+    - path: ./datasets/ml-server-small
+      hash: md5
+      md5: a2ca44e99af1217f27bacb9040734a90.dir
+      size: 3833200961
+      nfiles: 7581
+    - path: src/split_rename.py
+      hash: md5
+      md5: 0791aed781248516c45c437b09284aa9
+      size: 7131
+    params:
+      params.yaml:
+        bg_ratio: 1
+        classes: "['small']"
+        master_dir: ./datasets/ml-server-small
+        object_banks:
+        - small
+        output_dir: ./datasets/dataset-small
+        prefixes:
+          background: bg_
+          small: small_
+        splits:
+          train: 0.7
+          valid: 0.2
+          test: 0.1
+    outs:
+    - path: ./datasets/dataset-small
+      hash: md5
+      md5: d488982c35aeff9a867c9b4f21e5f49e.dir
+      size: 3450552872
+      nfiles: 7102
+  train:
+    cmd: python yolov8.py
+    deps:
+    - path: ./datasets/dataset-small/images
+      hash: md5
+      md5: 7bc4c85622272c6b8bfb2fd7bc97d306.dir
+      size: 3450461677
+      nfiles: 4734
+    - path: yolov8.py
+      hash: md5
+      md5: dbf25f2fc37662e49cc9ee297695db71
+      size: 743
+    params:
+      params.yaml:
+        train.batch_size: 16
+        train.epochs: 1000
+        train.name: test_1000
+    outs:
+    - path: runs/train/test_1000/weights/best.pt
+      hash: md5
+      md5: 6cebf33b0ea888433ebaac0b8d1f0630
+      size: 6568561

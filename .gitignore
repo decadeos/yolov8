@@ -225,3 +225,8 @@ __marimo__/
 datasets/
 test_videos/
 .yolov8
+
+*.txt
+*.png
+*.jpg
+runs/

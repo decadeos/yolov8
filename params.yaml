@@ -1,13 +1,11 @@
-master_dir: "./datasets/ml-server"
-output_dir: "./datasets/dataset-ball"
+master_dir: "./datasets/ml-server-small"
+output_dir: "./datasets/dataset-small"
 
-classes: "['airplane', 'small', 'red']"
+classes: "['small']"
 
 prefixes:
-  airplane: "airplane_"
   background: "bg_"
   small: "small_"
-  red_balls: "red_"
 
 splits:
   train: 0.7
@@ -20,11 +18,9 @@ bg_bank:
   - background
 
 object_banks:
-  - airplane
   - small
-  - red_balls
 
 train:
-  name: v11
-  epochs: 5000
+  name: test_150
+  epochs: 150
   batch_size: 16

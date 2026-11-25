@@ -23,76 +23,33 @@ stages:
       - ${output_dir}
 
   train:
-    cmd: python train.py --name ${train.name} --epochs ${train.epochs} --batch-size ${train.batch_size} --exist-ok --data ${output_dir}/data.yaml --resume
+    cmd: python yolov8.py
     params:
       - train.name
       - train.epochs
       - train.batch_size
     deps:
-      - train.py
+      # - yolov8.py
       - ${output_dir}/images
     outs:
       - runs/train/${train.name}/weights/best.pt
-
-  export:
-    cmd: python export.py --rknpu --weights runs/train/${train.name}/weights/best.pt
-    deps:
-      - runs/train/${train.name}/weights/best.pt
-      - export.py
-    outs:
-      - runs/train/${train.name}/weights/best.onnx
-
-  rknn:
-    cmd: source src/cmd/rknn.sh runs/train/${train.name}/weights/best.onnx
-    deps:
-      - runs/train/${train.name}/weights/best.onnx
-      - src/cmd/rknn.sh
-    outs:
-      - runs/train/${train.name}/output/${train.name}.rknn
-
-  json:
-    cmd: python src/make_json.py
-    deps:
-      - runs/train/${train.name}/output/${train.name}.rknn
-      - src/make_json.py
-    outs:
-      - runs/train/${train.name}/output/yolo_config.json
-
 
 plots:
   - precision_curve:
       title: "Precision"
       x: epoch
       y:
-        runs/train/${train.name}/results.csv: metrics/precision
+        runs/train/${train.name}/results.csv: metrics/precision(B)
 
   - recall_curve:
       title: "Recall"
       x: epoch
       y:
-        runs/train/${train.name}/results.csv: metrics/recall
+        runs/train/${train.name}/results.csv: metrics/recall(B)
 
   - pr_curve:
       title: "PR-curve"
       x:
-        runs/train/${train.name}/results.csv: metrics/recall
+        runs/train/${train.name}/results.csv: metrics/recall(B)
       y:
-        runs/train/${train.name}/results.csv: metrics/precision
-
-  - vol_curve:
-      title: "VOL-curve"
-      x: epoch
-      y:
-        runs/train/${train.name}/results.csv: val/obj_loss
-
-  - map50_curve:
-      title: "mAP@0.5-curve"
-      x: epoch
-      y:
-        runs/train/${train.name}/results.csv: metrics/mAP_0.5
-
-  - patience_curve:
-      title: "patience-curve"
-      x: epoch
-      y:
-        runs/train/${train.name}/results.csv: patience_count
+        runs/train/${train.name}/results.csv: metrics/precision(B)

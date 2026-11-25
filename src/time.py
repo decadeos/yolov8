@@ -11,9 +11,9 @@ config = yaml.safe_load(CONFIG_PATH.read_text())
 
 NUM_EVOLVE = 1
 NUM_EPOCH = config["train"]["epochs"]
-# NUM_EPOCH = 95
+# NUM_EPOCH = 10
 
-TIME_PER_EPOCH = 53
+TIME_PER_EPOCH = 11
 
 
 def main():
