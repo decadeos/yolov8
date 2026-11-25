@@ -20,10 +20,15 @@ DST_DIR = Path(config["output_dir"])
 # Пути
 BEST_PT = f"runs/train/{MODEL_NAME}/weights/best.pt"
 DATA_YAML = f"{DST_DIR}/data.yaml"
-TEST_IMG_DIR = f"{DST_DIR}/images/valid"
-LABELS_DIR = f"{DST_DIR}/labels/valid"
+TEST_IMG_DIR = f"{DST_DIR}/images/test"
+LABELS_DIR = f"{DST_DIR}/labels/test"
 
-def calculate_metrics(predictions, gt_boxes, iou_threshold=0.5):
+CONF = 0.35
+IOU_TRES = 0.45
+
+print(f"[YOLOv8 model] {MODEL_NAME}")
+
+def calculate_metrics(predictions, gt_boxes, iou_threshold=IOU_TRES):
     """Честный подсчет TP/FP/FN при фиксированном IoU"""
     tp, fp, fn = 0, 0, 0
     used_gt = [False] * len(gt_boxes)
@@ -98,15 +103,15 @@ def main():
     # ==========================================
     # 1. ЧЕСТНАЯ ВАЛИДАЦИЯ ЧИСТОЙ YOLOv8
     # ==========================================
-    print("--- [1/2] Запуск честной валидации YOLOv8 (IoU=0.5, conf=0.25) ---")
+    print(f"--- [1/2] Запуск честной валидации YOLOv8 (IoU={IOU_TRES}, conf={CONF}) ---")
     model_ultra = YOLO(BEST_PT)
     
     # Используем predict вместо val для идентичных условий с SAHI
     ultra_preds = model_ultra.predict(
         source=TEST_IMG_DIR,
         data=DATA_YAML,
-        conf=0.25,
-        iou=0.5,
+        conf=CONF,
+        iou=IOU_TRES,
         save=False,
         verbose=False
     )
@@ -125,7 +130,7 @@ def main():
             for box in pred.boxes:
                 yolo_preds_formatted.append(box.xyxy[0].cpu().numpy())
 
-        tp, fp, fn = calculate_metrics(yolo_preds_formatted, gt_boxes, iou_threshold=0.5)
+        tp, fp, fn = calculate_metrics(yolo_preds_formatted, gt_boxes, iou_threshold=IOU_TRES)
         total_tp_yolo += tp
         total_fp_yolo += fp
         total_fn_yolo += fn
@@ -143,7 +148,7 @@ def main():
     model_sahi = AutoDetectionModel.from_pretrained(
         model_type="yolov8",
         model_path=BEST_PT,
-        confidence_threshold=0.35,
+        confidence_threshold=CONF,
         device="cuda:0"
     )
 
@@ -158,15 +163,15 @@ def main():
         result = get_sliced_prediction(
             image=img_path,
             detection_model=model_sahi,
-            slice_height=640,
-            slice_width=640,
-            overlap_height_ratio=0.2,
-            overlap_width_ratio=0.2,
+            slice_height=256,
+            slice_width=256,
+            overlap_height_ratio=0.3,
+            overlap_width_ratio=0.3,
             postprocess_type="GREEDYNMM",
             verbose=False
         )
         
-        tp, fp, fn = calculate_metrics(result.object_prediction_list, gt_boxes, iou_threshold=0.5)
+        tp, fp, fn = calculate_metrics(result.object_prediction_list, gt_boxes, iou_threshold=IOU_TRES)
         total_tp_sahi += tp
         total_fp_sahi += fp
         total_fn_sahi += fn

@@ -48,17 +48,13 @@ stages:
       md5: 7bc4c85622272c6b8bfb2fd7bc97d306.dir
       size: 3450461677
       nfiles: 4734
-    - path: yolov8.py
-      hash: md5
-      md5: dbf25f2fc37662e49cc9ee297695db71
-      size: 743
     params:
       params.yaml:
         train.batch_size: 16
-        train.epochs: 1000
-        train.name: test_1000
+        train.epochs: 150
+        train.name: test_150
     outs:
-    - path: runs/train/test_1000/weights/best.pt
+    - path: runs/train/test_150/weights/best.pt
       hash: md5
-      md5: 6cebf33b0ea888433ebaac0b8d1f0630
-      size: 6568561
+      md5: 6cce3c6ae450987ff7885682fe551b86
+      size: 6537841

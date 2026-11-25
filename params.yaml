@@ -21,6 +21,6 @@ object_banks:
   - small
 
 train:
-  name: test_150
+  name: test_298
   epochs: 150
   batch_size: 16

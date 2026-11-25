@@ -230,3 +230,4 @@ test_videos/
 *.png
 *.jpg
 runs/
+*.pt
